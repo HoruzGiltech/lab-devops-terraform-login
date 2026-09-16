@@ -2,36 +2,45 @@ name: Integración Continua (CI) 🚀
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test-and-validate:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Descargar el código 📥
-      uses: actions/checkout@v4
+      - name: Descargar el código 📥
+        uses: actions/checkout@v4
 
-    - name: Configurar Python 🐍
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Configurar Python 🐍
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Instalar dependencias y ejecutar tests 🧪
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r app/requirements.txt
-        PYTHONPATH=. pytest app/test_main.py
+      - name: Instalar dependencias y ejecutar tests 🧪
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt
+          PYTHONPATH=. pytest app/test_main.py
 
-    - name: Validar sintaxis de Terraform 🛠️
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: '1.7.5'
+      - name: "Authenticate to Google Cloud via WIF"
+        uses: "google-github-actions/auth@v2"
+        with:
+          workload_identity_provider: "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
 
-    - name: Chequeo de Terraform Init & Validate 🔍
-      run: |
-        cd terraform
-        terraform init -backend=false
-        terraform validate
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
+
+      - name: Validar sintaxis de Terraform 🛠️
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+
+      - name: Chequeo de Terraform Init & Validate 🔍
+        run: |
+          cd terraform
+          terraform init -backend=false
+          terraform validate
