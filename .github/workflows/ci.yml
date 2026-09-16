@@ -10,6 +10,10 @@ jobs:
   test-and-validate:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Descargar el código 📥
         uses: actions/checkout@v4
@@ -24,6 +28,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r app/requirements.txt
           PYTHONPATH=. pytest app/test_main.py
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: "Authenticate to Google Cloud via WIF"
         uses: "google-github-actions/auth@v2"
