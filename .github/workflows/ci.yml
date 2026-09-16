@@ -1,4 +1,4 @@
-name: Integración Continua (CI) 🚀
+name: Integración Continua (CI/CD) 🚀
 
 on:
   push:
